@@ -1,4 +1,436 @@
 #!/usr/bin/env node
+import { createRequire as __createRequire } from "node:module"; const require = __createRequire(import.meta.url);
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __commonJS = (cb, mod) => function __require() {
+  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
+
+// shared/public-update-sources.cjs
+var require_public_update_sources = __commonJS({
+  "shared/public-update-sources.cjs"(exports, module) {
+    "use strict";
+    var PUBLIC_GITHUB_OWNER = "liliMozi";
+    var PUBLIC_GITHUB_REPO = "openhanako";
+    var PUBLIC_GITHUB_RELEASE_BASE = `https://github.com/${PUBLIC_GITHUB_OWNER}/${PUBLIC_GITHUB_REPO}/releases/download`;
+    var PUBLIC_R2_ORIGIN = "https://dl.openhanako.com";
+    function assertPublicChannel(channel) {
+      if (channel !== "stable" && channel !== "beta") throw new Error("Public update channel must be stable or beta");
+      return channel;
+    }
+    function publicChannelManifestSources(channel) {
+      assertPublicChannel(channel);
+      return [
+        { id: "origin", url: `${PUBLIC_GITHUB_RELEASE_BASE}/channels/${channel}.json` },
+        { id: "r2", url: `${PUBLIC_R2_ORIGIN}/channels/${channel}.json` }
+      ];
+    }
+    function cleanPublicUrl(value) {
+      try {
+        const url = new URL(value);
+        if (url.protocol !== "https:" || url.username || url.password || url.search || url.hash) return null;
+        return url;
+      } catch {
+        return null;
+      }
+    }
+    function publicArtifactReleaseTag(base) {
+      const url = cleanPublicUrl(base);
+      if (!url) return null;
+      const prefix = url.origin === "https://github.com" ? `/${PUBLIC_GITHUB_OWNER}/${PUBLIC_GITHUB_REPO}/releases/download/` : url.origin === PUBLIC_R2_ORIGIN ? "/" : null;
+      if (!prefix || !url.pathname.startsWith(prefix)) return null;
+      const tag = url.pathname.slice(prefix.length).replace(/\/$/, "");
+      return /^train-(?:(?:stable|beta)-)?[1-9][0-9]*$/.test(tag) ? tag : null;
+    }
+    function withPublicArtifactMirrorFallbacks(mirrors) {
+      if (!Array.isArray(mirrors)) return mirrors;
+      const tags = mirrors.map(publicArtifactReleaseTag);
+      if (!tags.length || tags.some((tag) => !tag)) return mirrors;
+      const result = [...mirrors];
+      for (const tag of tags) {
+        for (const candidate of [`${PUBLIC_GITHUB_RELEASE_BASE}/${tag}`, `${PUBLIC_R2_ORIGIN}/${tag}`]) {
+          if (!result.some((base) => String(base).replace(/\/+$/, "") === candidate)) result.push(candidate);
+        }
+      }
+      return result;
+    }
+    function safeVersion(version) {
+      return typeof version === "string" && /^(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/.test(version);
+    }
+    function publicInstallerUrls(version, filename) {
+      if (!safeVersion(version) || typeof filename !== "string" || !/^[A-Za-z0-9][A-Za-z0-9._+-]*$/.test(filename)) {
+        throw new Error("Invalid public installer version or filename");
+      }
+      return {
+        origin: `${PUBLIC_GITHUB_RELEASE_BASE}/v${version}/${filename}`,
+        r2: `${PUBLIC_R2_ORIGIN}/${filename}`
+      };
+    }
+    module.exports = {
+      PUBLIC_GITHUB_OWNER,
+      PUBLIC_GITHUB_REPO,
+      PUBLIC_GITHUB_RELEASE_BASE,
+      PUBLIC_R2_ORIGIN,
+      assertPublicChannel,
+      publicChannelManifestSources,
+      withPublicArtifactMirrorFallbacks,
+      publicInstallerUrls
+    };
+  }
+});
+
+// shared/official-identity-digests.json
+var require_official_identity_digests = __commonJS({
+  "shared/official-identity-digests.json"(exports, module) {
+    module.exports = {
+      version: 1,
+      digests: {
+        serviceDomain: [
+          "413a3f5ec7ebbd3eb24f52c1c8dfa23ccf9408b4a1c85c579a08242e7af74241"
+        ],
+        serviceSubdomainParent: [
+          "77f4c04063449b3c359a832068b322cf2c8fab876f7353b1d61a94410807f307"
+        ],
+        expoProjectId: [
+          "83ea0153d2ff7363ec82a92f4372a96c11fe8265f3c5ff91e249eb3753385ab5"
+        ],
+        expoOwner: [
+          "c9b8c56713ad457a05d05424094883d0a212e7e10b9d072012d1081aa53a659e"
+        ],
+        mobileName: [
+          "37338b9eabc79808e12215a6a983c3f2e6faffd929c0073e296c370bce9358cb"
+        ],
+        mobileSlug: [
+          "dfd46b51fae0cf4ccd33486529fc75d7b9880ef40123a8172fc9c3b0bb9a1025"
+        ],
+        mobileScheme: [
+          "91dba307babac20f8d08f097b03a1d7a8282c83404271a24a25a6da3f3b7315c"
+        ],
+        mobileBundleIdentifier: [
+          "33ed71cd12c5616e6cdb449db9f528f28a54abf611c5e2ea899f79eb4d4799e0"
+        ],
+        accountBaseUrl: [
+          "bcbf79f2058f33b503d26a24711653a8929bf4ad3b8342e4a29016b21c9a541d"
+        ],
+        desktopFeedUrl: [
+          "0615713d3781d0f55cfb8e2ce7e51fda6e1f970d565d8e167dcb470c92d56174"
+        ],
+        officialCnMarketUrl: [
+          "db6543fc4030aa9924607c2ef1ab823afe3fb696fba480a58c6852670e7a9f8b"
+        ]
+      }
+    };
+  }
+});
+
+// shared/official-identity.cjs
+var require_official_identity = __commonJS({
+  "shared/official-identity.cjs"(exports, module) {
+    "use strict";
+    var { digests: DIGESTS } = require_official_identity_digests();
+    var K = new Uint32Array([
+      1116352408,
+      1899447441,
+      3049323471,
+      3921009573,
+      961987163,
+      1508970993,
+      2453635748,
+      2870763221,
+      3624381080,
+      310598401,
+      607225278,
+      1426881987,
+      1925078388,
+      2162078206,
+      2614888103,
+      3248222580,
+      3835390401,
+      4022224774,
+      264347078,
+      604807628,
+      770255983,
+      1249150122,
+      1555081692,
+      1996064986,
+      2554220882,
+      2821834349,
+      2952996808,
+      3210313671,
+      3336571891,
+      3584528711,
+      113926993,
+      338241895,
+      666307205,
+      773529912,
+      1294757372,
+      1396182291,
+      1695183700,
+      1986661051,
+      2177026350,
+      2456956037,
+      2730485921,
+      2820302411,
+      3259730800,
+      3345764771,
+      3516065817,
+      3600352804,
+      4094571909,
+      275423344,
+      430227734,
+      506948616,
+      659060556,
+      883997877,
+      958139571,
+      1322822218,
+      1537002063,
+      1747873779,
+      1955562222,
+      2024104815,
+      2227730452,
+      2361852424,
+      2428436474,
+      2756734187,
+      3204031479,
+      3329325298
+    ]);
+    function sha256Hex(text) {
+      const data = new TextEncoder().encode(String(text));
+      const bitLength = data.length * 8;
+      const blocks = Math.ceil((data.length + 9) / 64);
+      const bytes = new Uint8Array(blocks * 64);
+      bytes.set(data);
+      bytes[data.length] = 128;
+      const view = new DataView(bytes.buffer);
+      view.setUint32(bytes.length - 8, Math.floor(bitLength / 4294967296));
+      view.setUint32(bytes.length - 4, bitLength >>> 0);
+      const h = new Uint32Array([1779033703, 3144134277, 1013904242, 2773480762, 1359893119, 2600822924, 528734635, 1541459225]);
+      const w = new Uint32Array(64);
+      const rotr = (x, n) => x >>> n | x << 32 - n;
+      for (let offset = 0; offset < bytes.length; offset += 64) {
+        for (let i = 0; i < 16; i += 1) w[i] = view.getUint32(offset + i * 4);
+        for (let i = 16; i < 64; i += 1) {
+          const s0 = rotr(w[i - 15], 7) ^ rotr(w[i - 15], 18) ^ w[i - 15] >>> 3;
+          const s1 = rotr(w[i - 2], 17) ^ rotr(w[i - 2], 19) ^ w[i - 2] >>> 10;
+          w[i] = w[i - 16] + s0 + w[i - 7] + s1 >>> 0;
+        }
+        let [a, b, c, d, e, f, g, hh] = h;
+        for (let i = 0; i < 64; i += 1) {
+          const t1 = hh + (rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25)) + (e & f ^ ~e & g) + K[i] + w[i] >>> 0;
+          const t2 = (rotr(a, 2) ^ rotr(a, 13) ^ rotr(a, 22)) + (a & b ^ a & c ^ b & c) >>> 0;
+          hh = g;
+          g = f;
+          f = e;
+          e = d + t1 >>> 0;
+          d = c;
+          c = b;
+          b = a;
+          a = t1 + t2 >>> 0;
+        }
+        h[0] += a;
+        h[1] += b;
+        h[2] += c;
+        h[3] += d;
+        h[4] += e;
+        h[5] += f;
+        h[6] += g;
+        h[7] += hh;
+      }
+      return Array.from(h, (word) => word.toString(16).padStart(8, "0")).join("");
+    }
+    var URL_KEYS = /* @__PURE__ */ new Set(["accountBaseUrl", "desktopFeedUrl", "officialCnMarketUrl"]);
+    function digestOfficialValue(key, value) {
+      const normalized = URL_KEYS.has(key) ? value : value.toLowerCase();
+      return sha256Hex(`hana-official-identity-v1
+${key}
+${normalized}`);
+    }
+    function matchesOfficialValue(key, value, digests = DIGESTS) {
+      const reserved = digests[key];
+      if (!Array.isArray(reserved)) throw new Error(`unknown official identity key: ${key}`);
+      if (typeof value !== "string" || value.length === 0) return false;
+      return reserved.includes(digestOfficialValue(key, value));
+    }
+    function isOfficialServiceHost(hostname, digests = DIGESTS) {
+      const labels = String(hostname).toLowerCase().split(".");
+      for (let i = 0; i < labels.length - 1; i += 1) {
+        const suffix = labels.slice(i).join(".");
+        if (matchesOfficialValue("serviceDomain", suffix, digests)) return true;
+        if (i > 0 && matchesOfficialValue("serviceSubdomainParent", suffix, digests)) return true;
+      }
+      return false;
+    }
+    module.exports = { OFFICIAL_IDENTITY_DIGESTS: DIGESTS, digestOfficialValue, matchesOfficialValue, isOfficialServiceHost, sha256Hex };
+  }
+});
+
+// shared/public-edition-identity.cjs
+var require_public_edition_identity = __commonJS({
+  "shared/public-edition-identity.cjs"(exports, module) {
+    "use strict";
+    var { PUBLIC_GITHUB_OWNER, PUBLIC_GITHUB_REPO, PUBLIC_GITHUB_RELEASE_BASE } = require_public_update_sources();
+    var { matchesOfficialValue } = require_official_identity();
+    var PUBLIC_EDITION = Object.freeze({
+      id: "hana-global",
+      kind: "official-global",
+      displayName: "Hana",
+      desktop: Object.freeze({
+        appId: "com.hanako.app",
+        productName: "HanaAgent",
+        dataDirName: ".hanako",
+        devDataDirName: ".hanako-dev"
+      }),
+      services: Object.freeze({
+        accountBaseUrl: null,
+        features: Object.freeze({
+          relay: false,
+          attachments: false,
+          asr: false,
+          feedback: false,
+          platformModels: false,
+          activityReporting: false,
+          usageReporting: false
+        })
+      }),
+      market: Object.freeze({
+        sources: Object.freeze({
+          global: "https://raw.githubusercontent.com/liliMozi/hana-marketplace/main/index.v2.json"
+        })
+      }),
+      modelCatalog: Object.freeze({
+        url: "https://github.com/liliMozi/hana-model-catalog/releases/latest/download/model-catalog.v2.json"
+      }),
+      updates: Object.freeze({
+        desktop: Object.freeze({
+          feedUrl: PUBLIC_GITHUB_RELEASE_BASE,
+          digestBaseUrl: `${PUBLIC_GITHUB_RELEASE_BASE}/{tag}/{asset}`,
+          installerPageUrl: "https://openhanako.com/",
+          releasesPageUrl: `https://github.com/${PUBLIC_GITHUB_OWNER}/${PUBLIC_GITHUB_REPO}/releases`
+        }),
+        artifact: Object.freeze({
+          channelBaseUrl: `${PUBLIC_GITHUB_RELEASE_BASE}/channels`
+        }),
+        mobile: Object.freeze({
+          versionBaseUrl: null,
+          expo: null
+        })
+      })
+    });
+    function canonical(value) {
+      if (value === null || typeof value !== "object") return JSON.stringify(value);
+      if (Array.isArray(value)) return `[${value.map(canonical).join(",")}]`;
+      return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${canonical(value[key])}`).join(",")}}`;
+    }
+    function identitySubset(config) {
+      const updates = config && config.updates && typeof config.updates === "object" ? config.updates : {};
+      const services = config && config.services && typeof config.services === "object" ? config.services : {};
+      const sources = config?.market?.sources && typeof config.market.sources === "object" ? config.market.sources : {};
+      return {
+        id: config?.id,
+        kind: config?.kind,
+        displayName: config?.displayName,
+        desktop: config?.desktop,
+        services: { accountBaseUrl: services.accountBaseUrl, features: services.features },
+        market: { sources: { global: sources.global } },
+        modelCatalog: config?.modelCatalog,
+        updates: {
+          desktop: updates.desktop,
+          artifact: { channelBaseUrl: updates.artifact?.channelBaseUrl },
+          mobile: updates.mobile
+        }
+      };
+    }
+    function hasPublicCnMarketSource(config) {
+      return matchesOfficialValue("officialCnMarketUrl", config?.market?.sources?.cn);
+    }
+    function isPublicDesktopEdition2(config) {
+      return canonical(identitySubset(config)) === canonical(identitySubset(PUBLIC_EDITION)) && hasPublicCnMarketSource(config);
+    }
+    module.exports = { PUBLIC_EDITION, isPublicDesktopEdition: isPublicDesktopEdition2 };
+  }
+});
+
+// shared/service-destination.cjs
+var require_service_destination = __commonJS({
+  "shared/service-destination.cjs"(exports, module) {
+    "use strict";
+    var { isOfficialServiceHost, matchesOfficialValue } = require_official_identity();
+    function isOriginalService2(value) {
+      const url = new URL(value);
+      const host = url.hostname.toLowerCase();
+      return isOfficialServiceHost(host) || host === "u.expo.dev" && matchesOfficialValue("expoProjectId", url.pathname.split("/")[1] || "") || (host === "github.com" || host === "raw.githubusercontent.com") && /^\/liliMozi\/(openhanako|hana-marketplace|hana-model-catalog)(\/|$)/i.test(url.pathname);
+    }
+    function origin(value) {
+      const url = new URL(value);
+      if (url.protocol === "wss:") url.protocol = "https:";
+      if (url.protocol === "ws:") url.protocol = "http:";
+      return url.origin;
+    }
+    function assertServiceDestination(value, policy, purpose = "http") {
+      if (policy.kind === "official-cn") return value;
+      let url;
+      try {
+        url = new URL(value);
+      } catch {
+        throw new Error("untrusted_service_destination");
+      }
+      const protocols = purpose === "relay" ? ["wss:", "ws:"] : ["https:", "http:"];
+      if (!protocols.includes(url.protocol) || url.username || url.password || url.hash || (purpose === "relay" || purpose === "gateway") && url.search || isOriginalService2(value)) throw new Error("untrusted_service_destination");
+      const allowed = [policy.accountBaseUrl, ...policy.trustedOrigins || []].filter(Boolean).map(origin);
+      if (!allowed.includes(origin(value))) throw new Error("untrusted_service_destination");
+      return value;
+    }
+    function assertServiceResponse(body, policy) {
+      if (!body || typeof body !== "object" || policy.kind === "official-cn") return;
+      for (const field of ["relayUrl", "gatewayBaseUrl", "uploadUrl", "downloadUrl", "objectUrl"]) {
+        if (body[field] != null) assertServiceDestination(
+          body[field],
+          policy,
+          field === "relayUrl" ? "relay" : field === "gatewayBaseUrl" ? "gateway" : "http"
+        );
+      }
+    }
+    var guardedExecutors = /* @__PURE__ */ new WeakMap();
+    function protectServiceExecutor(executor, policy) {
+      if (!executor || typeof executor.createRequest !== "function") return false;
+      const current = guardedExecutors.get(executor);
+      if (current) {
+        current.policy = policy;
+        return true;
+      }
+      const state = { policy };
+      guardedExecutors.set(executor, state);
+      const original = executor.createRequest;
+      executor.createRequest = function(options, callback) {
+        const authority = `${options.protocol || "https:"}//${options.hostname || options.host}${options.port ? ":" + options.port : ""}`;
+        assertServiceDestination(new URL(options.path || "/", authority).href, state.policy);
+        return original.call(this, options, callback);
+      };
+      return true;
+    }
+    module.exports = { protectServiceExecutor, isOriginalService: isOriginalService2, assertServiceDestination, assertServiceResponse };
+  }
+});
 
 // scripts/extension-market-sync.mjs
 import crypto from "node:crypto";
@@ -13,7 +445,8 @@ var EXTENSION_KINDS = Object.freeze([
   "recipe",
   "connector",
   "role",
-  "bundle"
+  "bundle",
+  "sticker-pack"
 ]);
 var EXTENSION_KIND_SET = new Set(EXTENSION_KINDS);
 function isExtensionKind(v) {
@@ -189,6 +622,89 @@ function validateMarketIndexV2(raw) {
     warnings
   };
 }
+
+// shared/generated/edition.json
+var edition_default = {
+  schemaVersion: 1,
+  id: "hana-global",
+  kind: "official-global",
+  displayName: "Hana",
+  desktop: {
+    appId: "com.hanako.app",
+    productName: "HanaAgent",
+    dataDirName: ".hanako",
+    devDataDirName: ".hanako-dev"
+  },
+  mobile: {
+    name: "HANA",
+    slug: "hana-mobile",
+    scheme: "hana",
+    iosBundleIdentifier: "org.example.hana",
+    androidPackage: "org.example.hana"
+  },
+  services: {
+    accountBaseUrl: null,
+    features: {
+      relay: false,
+      attachments: false,
+      asr: false,
+      feedback: false,
+      platformModels: false,
+      activityReporting: false,
+      usageReporting: false
+    }
+  },
+  market: {
+    sources: {
+      global: "https://raw.githubusercontent.com/liliMozi/hana-marketplace/main/index.v2.json",
+      cn: "https://extension-market-cn.hanaagent.workers.dev/extensions/index.v2.json"
+    }
+  },
+  modelCatalog: {
+    url: "https://github.com/liliMozi/hana-model-catalog/releases/latest/download/model-catalog.v2.json"
+  },
+  updates: {
+    desktop: {
+      feedUrl: "https://github.com/liliMozi/openhanako/releases/download",
+      digestBaseUrl: "https://github.com/liliMozi/openhanako/releases/download/{tag}/{asset}",
+      installerPageUrl: "https://openhanako.com/",
+      releasesPageUrl: "https://github.com/liliMozi/openhanako/releases"
+    },
+    artifact: {
+      channelBaseUrl: "https://github.com/liliMozi/openhanako/releases/download/channels",
+      keyset: [
+        {
+          keyId: "2026a",
+          publicKey: "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEABxlmYzrnEDdrKL7lW+KQsvO5omvy8Wyuj1G3YIs7eFo=\n-----END PUBLIC KEY-----\n"
+        }
+      ]
+    },
+    mobile: {
+      versionBaseUrl: null,
+      expo: null
+    }
+  },
+  serviceScope: "local-only",
+  profileHash: "286f0b03bb9211cf4d0f6701344278136beb05eb0216602792157378d41f3cbc"
+};
+
+// shared/edition-config.ts
+var import_public_edition_identity = __toESM(require_public_edition_identity(), 1);
+function freeze(value) {
+  if (value && typeof value === "object") {
+    for (const child of Object.values(value)) freeze(child);
+    Object.freeze(value);
+  }
+  return value;
+}
+var supportedKind = edition_default.kind === "custom" || edition_default.kind === "official-global" && (0, import_public_edition_identity.isPublicDesktopEdition)(edition_default);
+if (edition_default.schemaVersion !== 1 || !supportedKind || !/^[a-f0-9]{64}$/.test(edition_default.profileHash)) {
+  throw new Error("Edition configuration is invalid or unsupported. Hana Cloud requires a custom edition or the maintained public profile; prepare a supported profile before starting or building Hana.");
+}
+var EDITION = freeze(edition_default);
+
+// lib/remote-data/bounded-fetch.ts
+var import_service_destination = __toESM(require_service_destination(), 1);
 
 // shared/log-redactor.ts
 var REDACTED = "[redacted]";
@@ -637,6 +1153,9 @@ async function readBoundedBody(body, maxResponseBytes, abort, signal, onChunk) {
   }
   return { body: Buffer.concat(chunks), bytes: total };
 }
+function isProfileReadOnlySource(url) {
+  return Object.values(EDITION.market.sources).some((source) => source === url) || EDITION.modelCatalog.url === url;
+}
 async function requestBounded({
   url,
   maxRedirects,
@@ -645,11 +1164,16 @@ async function requestBounded({
   fetchImpl = fetch,
   signal
 }, onChunk) {
+  const profileReadOnlyOrigin = EDITION.kind === "custom" && isProfileReadOnlySource(url) ? assertHttps(url).origin : null;
   let currentUrl = url;
   let hop = 0;
   for (; ; ) {
     signal?.throwIfAborted();
     assertHttps(currentUrl);
+    const isProfileReadOnlyRedirect = profileReadOnlyOrigin !== null && new URL(currentUrl).origin === profileReadOnlyOrigin;
+    if (EDITION.kind === "custom" && (0, import_service_destination.isOriginalService)(currentUrl) && !isProfileReadOnlySource(currentUrl) && !isProfileReadOnlyRedirect) {
+      throw new BoundedFetchError("untrusted_service_destination", "INVALID_REDIRECT");
+    }
     const controller = new AbortController();
     const timeoutSignal = AbortSignal.timeout(timeoutMs);
     const requestSignal = AbortSignal.any([controller.signal, timeoutSignal, ...signal ? [signal] : []]);

@@ -6,7 +6,7 @@
 
 本仓库是 Hana **Global 市场目录**。PR 用于登记作者的 GitHub 仓库，不用于上传扩展源码或安装包。中国大陆市场独立审核和发布，不会自动同步此处的收录。
 
-支持 `app`、`skill`、`recipe`、`connector`、`role`、`bundle` 六种扩展。新 App 必须使用 manifestVersion 2；v1 是冻结的兼容层，不接受新的市场投稿。
+支持 `app`、`skill`、`recipe`、`connector`、`role`、`bundle`、`sticker-pack` 七种扩展。新 App 必须使用 manifestVersion 2；v1 是冻结的兼容层，不接受新的市场投稿。
 
 ### 1. 准备可安装的发布包
 
@@ -19,6 +19,8 @@ npm run pack:extension -- --kind app --dir /path/to/my-app \
 
 将示例路径和发布者换成自己的值。其他扩展使用对应的 `--kind`。App 需要先完成自己的构建，运行入口不能是未编译的 `.ts` 文件。Connector 包不能包含令牌或其他凭据。
 
+表情包版本须为语义化版本，至少包含一张 PNG、JPEG、GIF 或 WebP 图片；单张不超过 2 MiB、边长不超过 1024 像素，整个包最多 300 张图片、100 MiB（包含未引用的文件）。封面（未指定时为第一张贴纸）用作市场图标，可选的 `description` 用作市场简介；角色卡头像用作市场图标。
+
 保留打包器生成的 **`.entry.json` 和对应 `.zip`**，不要手动改写大小或 SHA-256，也不要用 GitHub 自动生成的源码归档代替安装包。完整的清单和打包要求见 [Hana App 文档](https://github.com/liliMozi/openhanako/blob/main/APPS.md)。
 
 ### 2. 在自己的仓库发布正式 Release
@@ -28,7 +30,7 @@ npm run pack:extension -- --kind app --dir /path/to/my-app \
 - Release 不能是草稿或预发布版本。
 - 市场只按 `approvals.json` 中登记的 tag 读取 Release，不会自动选用 latest Release。
 - Release tag 只能使用字母、数字、`.`、`_`、`+`、`-`，例如 `v1.2.0`。
-- App、Connector、Role、Bundle 的条目附件名为 `<kind>-<id>-<version>.entry.json`。
+- App、Connector、Role、Bundle、Sticker Pack 的条目附件名为 `<kind>-<id>-<version>.entry.json`，对应 ZIP 为 `<kind>-<id>-<version>.zip`。
 - Skill、Recipe 的条目附件名为 `<kind>-<id>.entry.json`，ZIP 使用打包器生成的内容寻址文件名。
 - 每个登记项必须能匹配唯一的条目附件，且对应 ZIP 必须属于同一 Release。
 
@@ -145,7 +147,7 @@ PR 检查使用基线分支的同步器读取候选文件，不执行投稿代�
 
 This repository is the Hana **Global market catalog**. Enrollment PRs register an author's GitHub repository; they do not upload extension source code or installation packages. The mainland China catalog is reviewed and published independently.
 
-Supported kinds are `app`, `skill`, `recipe`, `connector`, `role`, and `bundle`. New Apps must use manifestVersion 2. The frozen v1 compatibility line does not accept new market submissions.
+Supported kinds are `app`, `skill`, `recipe`, `connector`, `role`, `bundle`, and `sticker-pack`. New Apps must use manifestVersion 2. The frozen v1 compatibility line does not accept new market submissions.
 
 ### 1. Package your extension
 
@@ -158,6 +160,8 @@ npm run pack:extension -- --kind app --dir /path/to/my-app \
 
 Replace the path, publisher, and kind as appropriate. Build Apps before packaging; their runtime entry must not be uncompiled TypeScript. Connector packages must not contain tokens or other credentials. See the [Hana App documentation](https://github.com/liliMozi/openhanako/blob/main/APPS_EN.md) for manifest and packaging requirements.
 
+Sticker packs need a semantic version and at least one PNG, JPEG, GIF, or WebP image. Each image is limited to 2 MiB and 1024 pixels per edge; packages are limited to 300 images and 100 MiB, including unreferenced files. The cover (or first sticker) is the market icon, and optional `description` is the market summary. Role avatars are used as market icons.
+
 Keep the generated `.entry.json` and matching `.zip` together. Do not alter their byte count or SHA-256 metadata, or substitute GitHub's automatically generated source archives.
 
 ### 2. Publish a stable GitHub Release
@@ -166,7 +170,7 @@ Upload both generated files as assets of a stable Release in the repository you 
 
 The market reads only the Release tag recorded in `approvals.json`; it never selects the latest Release automatically. Release tags may contain only letters, digits, `.`, `_`, `+`, and `-`, for example `v1.2.0`.
 
-- Apps, connectors, roles, and bundles: `<kind>-<id>-<version>.entry.json`.
+- Apps, connectors, roles, bundles, and sticker packs: `<kind>-<id>-<version>.entry.json` and `<kind>-<id>-<version>.zip`.
 - Skills and recipes: `<kind>-<id>.entry.json`, with the packer-generated content-addressed ZIP filename.
 - Each enrollment must match exactly one entry asset. Its ZIP must belong to the same Release.
 

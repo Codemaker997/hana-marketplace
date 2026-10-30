@@ -47,10 +47,21 @@ submit `readme` themselves if they prefer.
 
 作者可继续按标准版本投稿流程提交。维护者也可以从已批准的 Release 收集并审核介绍正文与配图后代作者写入 `readme`，作者无需重复提交快照；采审副本即为提交来源，审核后不再活取。版本更新时，既有 `readme` 须确认仍对应当前介绍，否则重新审核。作者仍可自行提交 `readme`。
 
-For apps, connectors, roles, and bundles the entry asset is named
-`<kind>-<id>-<version>.entry.json`. Skills and recipes use
-`<kind>-<id>.entry.json` and content-addressed ZIP files. Build both files with
-Hana's `extension-pack` command before uploading them.
+For apps, connectors, roles, bundles, and sticker packs the entry asset is named
+`<kind>-<id>-<version>.entry.json`, with a matching `<kind>-<id>-<version>.zip`.
+Skills and recipes use `<kind>-<id>.entry.json` and content-addressed ZIP files.
+Build both files with Hana's `extension-pack` command before uploading them.
+Sticker packs need a semantic version and at least one image; their cover (or
+first sticker) is the market icon, and optional `description` is the market
+summary. Role avatars are used as market icons. Image formats and limits are
+listed in the [submission guide](CONTRIBUTING.md).
+
+App、Connector、Role、Bundle 和表情包的条目附件名为
+`<kind>-<id>-<version>.entry.json`，对应 ZIP 为 `<kind>-<id>-<version>.zip`；
+Skill 和 Recipe 使用 `<kind>-<id>.entry.json` 与内容寻址 ZIP。上传前请用
+Hana 的 `extension-pack` 命令生成两个文件。表情包版本须为语义化版本，至少
+包含一张图片；封面（未指定时为第一张贴纸）用作市场图标，可选的
+`description` 用作市场简介。角色卡头像用作市场图标。图片格式和限制见[投稿指南](CONTRIBUTING.md)。
 
 The sync batch fails without changing the published index if any enrollment
 or approval is invalid, or a newly approved release is unavailable,
